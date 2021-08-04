@@ -12,8 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: cibuilds/github:0.13
-      volumes:
-        - with_code:/code
+      options: -v with_code:/code
     steps:
       - name: Checkout
         uses: actions/checkout@v2
