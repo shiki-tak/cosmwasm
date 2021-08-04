@@ -10,7 +10,8 @@ jobs:
   release:
     if: github.event.pull_request.merged == true && github.event.pull_request.head.ref == 'release'
     runs-on: ubuntu-latest
-    container: cibuilds/github:0.13
+    container:
+      image: cibuilds/github:0.13
       volumes:
         - with_code:/code
     steps:
