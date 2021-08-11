@@ -12,6 +12,8 @@ jobs:
   check_version:
     name: Check Version
     runs-on: ubuntu-latest
+    env:
+      INPUT_VERSION: "0.14.0-0.7.0"
     outputs:
       git_tag_name: ${{ steps.tag_check.outputs.git_tag_name }}
     steps:
