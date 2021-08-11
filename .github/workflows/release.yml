@@ -7,12 +7,21 @@ on:
     types: [closed]
 
 jobs:
+  check_version:
+    name: Check Version
+    runs-on: ubuntu-latest
+    outputs:
+      git_tag_name: ${{ steps.tag_check.outputs.git_tag_name }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: dudo/tag_check@v1.0.0
+        id: tag_check
+        with:
+          git_tag_prefix: v
   release:
     if: github.event.pull_request.merged == true && github.event.pull_request.head.ref == 'release'
     runs-on: ubuntu-latest
-    container:
-      image: cibuilds/github:0.13
-      options: -v with_code:/code
+    container: cibuilds/github:0.13
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -45,7 +54,7 @@ jobs:
       - name: Prepare volume with source code
         run: |
           # create a dummy container which will hold a volume with config
-          docker create alpine /bin/true
+          docker create -v /code --name with_code alpine /bin/true
           # copy a config file into this volume
           docker cp ./Cargo.toml with_code:/code
           docker cp ./contracts with_code:/code
@@ -53,12 +62,12 @@ jobs:
       - name: Build development contracts
         run: |
           echo "Building all contracts under ./contracts"
-          docker run cosmwasm/rust-optimizer:0.11.0 ./contracts/*/
+          docker run --volumes-from with_code cosmwasm/rust-optimizer:0.11.0 ./contracts/*/
       - name: Check development contracts
         working-directory: ./
         run: |
           echo "Checking all contracts under ./artifacts"
-          docker run rust:1.51.0 /bin/bash -e -c 'cd ./code/packages/vm; ./examples/check_contract.sh ../../artifacts/*.wasm'
+          docker run --volumes-from with_code rust:1.51.0 /bin/bash -e -c 'cd ./code/packages/vm; ./examples/check_contract.sh ../../artifacts/*.wasm'
           docker cp with_code:/code/artifacts .
 
       - name: Create Release
