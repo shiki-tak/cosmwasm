@@ -9,18 +9,6 @@ on:
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}    
 jobs:
-  check_version:
-    name: Check Version
-    runs-on: ubuntu-latest
-    outputs:
-      git_tag_name: ${{ steps.tag_check.outputs.git_tag_name }}
-    steps:
-      - uses: actions/checkout@v2
-      - uses: dudo/tag_check@v1.1.1
-        id: tag_check
-        with:
-          version: 0.14.0-0.7.0
-          git_tag_prefix: v
   release:
     if: github.event.pull_request.merged == true && github.event.pull_request.head.ref == 'release'
     runs-on: ubuntu-latest
@@ -46,7 +34,6 @@ jobs:
           HEAD_REF: ${{ github.event.pull_request.head.ref }}
       - name: Check version
         id: tag_check
-        uses: actions/checkout@v2
         uses: dudo/tag_check@v1.1.1
         with:
           version: ${{ steps.get_version.outputs.version }}
