@@ -30,13 +30,13 @@ jobs:
         uses: actions/checkout@v2
       # - name: Install libgcc
       #   run: apk add libgcc
-      # - name: Install Rust
-      #   uses: actions-rs/toolchain@v1
-      #   with:
-      #     toolchain: 1.51.0
-      #     target: wasm32-unknown-unknown
-      #     profile: minimal
-      #     override: true        
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: 1.51.0
+          target: wasm32-unknown-unknown
+          profile: minimal
+          override: true        
       - name: Get version
         id: get_version
         run: |
@@ -44,6 +44,14 @@ jobs:
             echo ::set-output name=version::$VERSION
         env:
           HEAD_REF: ${{ github.event.pull_request.head.ref }}
+      - name: Check version
+        uses: actions/checkout@v2
+        uses: dudo/tag_check@v1.1.1
+          id: tag_check
+          with:
+            version: ${{ steps.get_version.outputs.version }}
+            git_tag_prefix: v
+          
       - name: Create new tag
         run: |
           if [ -z "${{ steps.get_version.outputs.version }}" ]; then
@@ -52,8 +60,6 @@ jobs:
       - name: Install Docker client
         run: |
           apk add docker-cli
-      - name: Checkout
-        uses: actions/checkout@v2
       - name: Prepare volume with source code
         run: |
           # create a dummy container which will hold a volume with config
