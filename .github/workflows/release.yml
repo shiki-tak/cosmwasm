@@ -19,7 +19,7 @@ jobs:
       - uses: dudo/tag_check@v1.1.1
         id: tag_check
         with:
-          input_version: 0.14.0-0.7.0
+          version: 0.14.0-0.7.0
           git_tag_prefix: v
   release:
     if: github.event.pull_request.merged == true && github.event.pull_request.head.ref == 'release'
