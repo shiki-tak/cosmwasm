@@ -6,6 +6,8 @@ on:
       - main
     types: [closed]
 
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}    
 jobs:
   check_version:
     name: Check Version
